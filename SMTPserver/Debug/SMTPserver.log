@@ -1,41 +1,21 @@
-﻿生成启动时间为 2018/11/18 19:32:32。
+﻿生成启动时间为 2018/11/19 21:56:08。
      1>项目“D:\OneDrive - mail.nankai.edu.cn\File\南开\大三上\计算机网络\SMTPserver\SMTPserver\SMTPserver.vcxproj”在节点 2 上(build 个目标)。
-     1>PrepareForBuild:
-         正在创建目录“D:\OneDrive - mail.nankai.edu.cn\File\南开\大三上\计算机网络\SMTPserver\Debug\”。
-       InitializeBuildStatus:
-         正在创建“Debug\SMTPserver.unsuccessfulbuild”，因为已指定“AlwaysCreate”。
+     1>InitializeBuildStatus:
+         正在对“Debug\SMTPserver.unsuccessfulbuild”执行 Touch 任务。
        ClCompile:
-         C:\Program Files (x86)\Microsoft Visual Studio 10.0\VC\bin\CL.exe /c /ZI /nologo /W3 /WX- /Od /Oy- /D WIN32 /D _WINDOWS /D _DEBUG /D _UNICODE /D UNICODE /D _AFXDLL /Gm /EHsc /RTC1 /MDd /GS /fp:precise /Zc:wchar_t /Zc:forScope /Yc"StdAfx.h" /Fp"Debug\SMTPserver.pch" /Fo"Debug\\" /Fd"Debug\vc100.pdb" /Gd /TP /analyze- /errorReport:prompt stdafx.cpp
-         stdafx.cpp
-         C:\Program Files (x86)\Microsoft Visual Studio 10.0\VC\bin\CL.exe /c /ZI /nologo /W3 /WX- /Od /Oy- /D WIN32 /D _WINDOWS /D _DEBUG /D _UNICODE /D UNICODE /D _AFXDLL /Gm /EHsc /RTC1 /MDd /GS /fp:precise /Zc:wchar_t /Zc:forScope /Yu"StdAfx.h" /Fp"Debug\SMTPserver.pch" /Fo"Debug\\" /Fd"Debug\vc100.pdb" /Gd /TP /analyze- /errorReport:prompt SMTPserver.cpp SMTPserverDlg.cpp
+         所有输出均为最新。
+         C:\Program Files (x86)\Microsoft Visual Studio 10.0\VC\bin\CL.exe /c /ZI /nologo /W3 /WX- /Od /Oy- /D WIN32 /D _WINDOWS /D _DEBUG /D _UNICODE /D UNICODE /D _AFXDLL /Gm /EHsc /RTC1 /MDd /GS /fp:precise /Zc:wchar_t /Zc:forScope /Yu"StdAfx.h" /Fp"Debug\SMTPserver.pch" /Fo"Debug\\" /Fd"Debug\vc100.pdb" /Gd /TP /analyze- /errorReport:prompt Client.cpp SMTPserver.cpp SMTPserverDlg.cpp Server.cpp
+         Server.cpp
+     1>d:\onedrive - mail.nankai.edu.cn\file\南开\大三上\计算机网络\smtpserver\smtpserver\smtpserverdlg.h(2): fatal error C1014: 包含文件太多 : 深度 = 1024
          SMTPserverDlg.cpp
+     1>d:\onedrive - mail.nankai.edu.cn\file\南开\大三上\计算机网络\smtpserver\smtpserver\server.h(1): fatal error C1014: 包含文件太多 : 深度 = 1024
          SMTPserver.cpp
+     1>d:\onedrive - mail.nankai.edu.cn\file\南开\大三上\计算机网络\smtpserver\smtpserver\server.h(1): fatal error C1014: 包含文件太多 : 深度 = 1024
+         Client.cpp
+     1>d:\onedrive - mail.nankai.edu.cn\file\南开\大三上\计算机网络\smtpserver\smtpserver\smtpserverdlg.h(2): fatal error C1014: 包含文件太多 : 深度 = 1024
          正在生成代码...
-       ResourceCompile:
-         C:\Program Files (x86)\Microsoft SDKs\Windows\v7.0A\bin\rc.exe /D _DEBUG /D _UNICODE /D UNICODE /D _AFXDLL /l"0x0804" /IDebug\ /nologo /fo"Debug\SMTPserver.res" SMTPserver.rc 
-       ManifestResourceCompile:
-         C:\Program Files (x86)\Microsoft SDKs\Windows\v7.0A\bin\rc.exe /nologo /fo"Debug\SMTPserver.exe.embed.manifest.res" Debug\SMTPserver_manifest.rc 
-       Link:
-         C:\Program Files (x86)\Microsoft Visual Studio 10.0\VC\bin\link.exe /ERRORREPORT:PROMPT /OUT:"D:\OneDrive - mail.nankai.edu.cn\File\南开\大三上\计算机网络\SMTPserver\Debug\SMTPserver.exe" /INCREMENTAL /NOLOGO /MANIFEST /ManifestFile:"Debug\SMTPserver.exe.intermediate.manifest" /MANIFESTUAC:"level='asInvoker' uiAccess='false'" /DEBUG /PDB:"D:\OneDrive - mail.nankai.edu.cn\File\南开\大三上\计算机网络\SMTPserver\Debug\SMTPserver.pdb" /SUBSYSTEM:WINDOWS /TLBID:1 /ENTRY:"wWinMainCRTStartup" /DYNAMICBASE /NXCOMPAT /IMPLIB:"D:\OneDrive - mail.nankai.edu.cn\File\南开\大三上\计算机网络\SMTPserver\Debug\SMTPserver.lib" /MACHINE:X86 Debug\SMTPserver.res
-         Debug\SMTPserver.exe.embed.manifest.res
-         Debug\SMTPserver.obj
-         Debug\SMTPserverDlg.obj
-         Debug\stdafx.obj
-       Manifest:
-         C:\Program Files (x86)\Microsoft SDKs\Windows\v7.0A\bin\mt.exe /nologo /verbose /out:"Debug\SMTPserver.exe.embed.manifest" /manifest Debug\SMTPserver.exe.intermediate.manifest "C:\Program Files (x86)\Microsoft Visual Studio 10.0\VC\Include\Manifest\dpiaware.manifest"
-         C:\Program Files (x86)\Microsoft SDKs\Windows\v7.0A\bin\rc.exe /nologo /fo"Debug\SMTPserver.exe.embed.manifest.res" Debug\SMTPserver_manifest.rc 
-       LinkEmbedManifest:
-         C:\Program Files (x86)\Microsoft Visual Studio 10.0\VC\bin\link.exe /ERRORREPORT:PROMPT /OUT:"D:\OneDrive - mail.nankai.edu.cn\File\南开\大三上\计算机网络\SMTPserver\Debug\SMTPserver.exe" /INCREMENTAL /NOLOGO /MANIFEST /ManifestFile:"Debug\SMTPserver.exe.intermediate.manifest" /MANIFESTUAC:"level='asInvoker' uiAccess='false'" /DEBUG /PDB:"D:\OneDrive - mail.nankai.edu.cn\File\南开\大三上\计算机网络\SMTPserver\Debug\SMTPserver.pdb" /SUBSYSTEM:WINDOWS /TLBID:1 /ENTRY:"wWinMainCRTStartup" /DYNAMICBASE /NXCOMPAT /IMPLIB:"D:\OneDrive - mail.nankai.edu.cn\File\南开\大三上\计算机网络\SMTPserver\Debug\SMTPserver.lib" /MACHINE:X86 Debug\SMTPserver.res
-         Debug\SMTPserver.exe.embed.manifest.res
-         Debug\SMTPserver.obj
-         Debug\SMTPserverDlg.obj
-         Debug\stdafx.obj
-         SMTPserver.vcxproj -> D:\OneDrive - mail.nankai.edu.cn\File\南开\大三上\计算机网络\SMTPserver\Debug\SMTPserver.exe
-       FinalizeBuildStatus:
-         正在删除文件“Debug\SMTPserver.unsuccessfulbuild”。
-         正在对“Debug\SMTPserver.lastbuildstate”执行 Touch 任务。
-     1>已完成生成项目“D:\OneDrive - mail.nankai.edu.cn\File\南开\大三上\计算机网络\SMTPserver\SMTPserver\SMTPserver.vcxproj”(build 个目标)的操作。
+     1>已完成生成项目“D:\OneDrive - mail.nankai.edu.cn\File\南开\大三上\计算机网络\SMTPserver\SMTPserver\SMTPserver.vcxproj”(build 个目标)的操作 - 失败。
 
-生成成功。
+生成失败。
 
-已用时间 00:00:08.11
+已用时间 00:00:01.91

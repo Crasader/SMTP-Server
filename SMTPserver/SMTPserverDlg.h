@@ -1,4 +1,5 @@
-
+#include"Client.h"
+#include"Server.h"
 // SMTPserverDlg.h : м╥нд╪Ч
 //
 
@@ -34,4 +35,5 @@ public:
 	CString dlg_message;
 	CString dlg_content;
 	CString dlg_annex;
+	Server server;
 };

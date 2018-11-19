@@ -31,6 +31,8 @@ void Server::OnAccept(int nErrorCode)
 	if(Accept(*socket))
 	{
 		//socket±»½ÓÊÜ
+		CString return_ready_info = L"220 Simple Mail Server Ready for Mail";
+		socket->Send(return_ready_info,return_ready_info.GetLength());
 		dlg->dlg_log+="Connecting is being established\n";
 		dlg->UpdateData(false);
 	}
@@ -38,5 +40,6 @@ void Server::OnAccept(int nErrorCode)
 	{
 		delete socket;
 	}
+
 	CAsyncSocket::OnAccept(nErrorCode);
 }
