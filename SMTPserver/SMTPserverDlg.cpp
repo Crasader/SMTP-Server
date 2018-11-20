@@ -6,6 +6,8 @@
 #include "SMTPserver.h"
 #include "SMTPserverDlg.h"
 #include "afxdialogex.h"
+#include"Client.h"
+#include"Server.h"
 
 #ifdef _DEBUG
 #define new DEBUG_NEW
@@ -104,9 +106,10 @@ BOOL CSMTPserverDlg::OnInitDialog()
 	//  执行此操作
 	SetIcon(m_hIcon, TRUE);			// 设置大图标
 	SetIcon(m_hIcon, FALSE);		// 设置小图标
-
+	server = new Server();
+	server->Create(25);
 	// TODO: 在此添加额外的初始化代码
-
+	server->Listen();
 	return TRUE;  // 除非将焦点设置到控件，否则返回 TRUE
 }
 

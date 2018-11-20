@@ -1,12 +1,11 @@
-#include"Client.h"
-#include"Server.h"
+
 // SMTPserverDlg.h : 头文件
 //
 
 #pragma once
-
-
+#include"Server.h"
 // CSMTPserverDlg 对话框
+class Server;
 class CSMTPserverDlg : public CDialogEx
 {
 // 构造
@@ -35,5 +34,5 @@ public:
 	CString dlg_message;
 	CString dlg_content;
 	CString dlg_annex;
-	Server server;
+	Server *server;
 };

@@ -9,6 +9,7 @@ public:
 	virtual ~Client();
 	virtual void OnReceive(int nErrorCode);
 	char buffer[10000000];//»º´æ
+	virtual void OnSend(int nErrorCode);
 };
 
 
