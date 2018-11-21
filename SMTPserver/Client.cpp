@@ -29,15 +29,23 @@ void Client::OnReceive(int nErrorCode)
 	Receive(buffer,sizeof(buffer),0);
 	CString str(buffer);//将buffer转化成str
 	//接收到HELO的情况
-	if(str.Left(4) == "EHLO")
+	if(str.Right(5)=="\r\n.\r\n")
+	{
+		char buff[100]="250 data\r\n";
+		Send(buff,strlen(buff));//服务器响应250，表示请求的命令成功完成
+		dlg->dlg_log+="Server finished accepting";
+		dlg->UpdateData(false);
+		AsyncSelect(FD_READ);
+	}
+	if(str.Left(4) == "EHLO"||str.Left(4) == "HELO")//在本例中是EHLO
 	{
 		dlg->dlg_log += "Client:";
 		dlg->dlg_log += str;
-		dlg->dlg_log += '\n';
+		dlg->dlg_log += "\n";
 		dlg->UpdateData(false);//将收到的内容显示在窗口里
-		char* s1="250 Received HELO\n";
+		char* s1="250 Received HELO\r\n";
 		Send(s1,strlen(s1));
-		dlg->dlg_log += "Server:Received HELO\n";
+		dlg->dlg_log += "Server:Received HELO\r\n";
 		dlg->UpdateData(false);
 		AsyncSelect(FD_READ);
 	}
@@ -46,11 +54,11 @@ void Client::OnReceive(int nErrorCode)
 	{
 		dlg->dlg_log += "Client:";
 		dlg->dlg_log += str;
-		dlg->dlg_log += '\n';
+		dlg->dlg_log += "\n";
 		dlg->UpdateData(false);
 		char* s1="250 Received MAIL FROM\r\n";
 		Send(s1,strlen(s1));
-		dlg->dlg_log += "Server:Received MAIL FROM\n";
+		dlg->dlg_log += "Server:Received MAIL FROM\r\n";
 		dlg->UpdateData(false);
 		AsyncSelect(FD_READ);
 	}
@@ -59,11 +67,11 @@ void Client::OnReceive(int nErrorCode)
 	{
 		dlg->dlg_log += "Client:";
 		dlg->dlg_log += str;
-		dlg->dlg_log += '\n';
+		dlg->dlg_log += "\n";
 		dlg->UpdateData(false);
-		CString return_RCPT_TO_text = L"250 Received RECP TO\n";
-		Send(return_RCPT_TO_text,return_RCPT_TO_text.GetLength());
-		dlg->dlg_log += "Server:Received RECP TO\n";
+		char * s2 = "250 Received RECP TO\r\n";
+		Send(s2,strlen(s2));
+		dlg->dlg_log += "Server:Received RECP TO\r\n";
 		dlg->UpdateData(false);
 		AsyncSelect(FD_READ);
 	}
@@ -72,11 +80,11 @@ void Client::OnReceive(int nErrorCode)
 	{
 		dlg->dlg_log += "Client:";
 		dlg->dlg_log += str;
-		dlg->dlg_log += '\n';
+		dlg->dlg_log += "\n";
 		dlg->UpdateData(false);
-		CString return_DATA_text = L"354 Received DATA\n";
-		Send(return_DATA_text,return_DATA_text.GetLength());
-		dlg->dlg_log += "Server:Received DATA\n";
+		char * s3 = "354 Received DATA\r\n";
+		Send(s3,strlen(s3));
+		dlg->dlg_log += "Server:Received DATA\r\n";
 		dlg->UpdateData(false);
 		AsyncSelect(FD_READ);
 	}
@@ -84,11 +92,11 @@ void Client::OnReceive(int nErrorCode)
 	{
 		dlg->dlg_log += "Client:";
 		dlg->dlg_log += str;
-		dlg->dlg_log += '\n';
+		dlg->dlg_log += "\n";
 		dlg->UpdateData(false);
-		CString return_QUIT_text = L"221 Received QUIT\n";
-		Send(return_QUIT_text,return_QUIT_text.GetLength());
-		dlg->dlg_log += "Server:Received QUIT\n";
+		char *s4 = "221 Received QUIT\r\n";
+		Send(s4,strlen(s4));
+		dlg->dlg_log += "Server:Received QUIT\r\n";
 		dlg->UpdateData(false);
 		AsyncSelect(FD_READ);
 	}

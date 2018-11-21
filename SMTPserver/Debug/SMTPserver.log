@@ -1,4 +1,4 @@
-﻿生成启动时间为 2018/11/20 21:55:01。
+﻿生成启动时间为 2018/11/21 17:15:53。
      1>项目“D:\OneDrive - mail.nankai.edu.cn\File\南开\大三上\计算机网络\SMTPserver\SMTPserver\SMTPserver.vcxproj”在节点 2 上(build 个目标)。
      1>InitializeBuildStatus:
          正在创建“Debug\SMTPserver.unsuccessfulbuild”，因为已指定“AlwaysCreate”。
@@ -31,4 +31,4 @@
 
 生成成功。
 
-已用时间 00:00:00.75
+已用时间 00:00:00.59
