@@ -58,6 +58,8 @@ CSMTPserverDlg::CSMTPserverDlg(CWnd* pParent /*=NULL*/)
 	, dlg_annex(_T(""))
 {
 	m_hIcon = AfxGetApp()->LoadIcon(IDR_MAINFRAME);
+	//  data_begin = 0;
+	//  data_end = 0;
 }
 
 void CSMTPserverDlg::DoDataExchange(CDataExchange* pDX)

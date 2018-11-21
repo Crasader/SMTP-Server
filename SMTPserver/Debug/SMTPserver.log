@@ -1,4 +1,4 @@
-﻿生成启动时间为 2018/11/21 17:15:53。
+﻿生成启动时间为 2018/11/22 7:04:47。
      1>项目“D:\OneDrive - mail.nankai.edu.cn\File\南开\大三上\计算机网络\SMTPserver\SMTPserver\SMTPserver.vcxproj”在节点 2 上(build 个目标)。
      1>InitializeBuildStatus:
          正在创建“Debug\SMTPserver.unsuccessfulbuild”，因为已指定“AlwaysCreate”。
@@ -6,6 +6,13 @@
          所有输出均为最新。
          C:\Program Files (x86)\Microsoft Visual Studio 10.0\VC\bin\CL.exe /c /ZI /nologo /W3 /WX- /Od /Oy- /D WIN32 /D _WINDOWS /D _DEBUG /D _UNICODE /D UNICODE /D _AFXDLL /Gm /EHsc /RTC1 /MDd /GS /fp:precise /Zc:wchar_t /Zc:forScope /Yu"StdAfx.h" /Fp"Debug\SMTPserver.pch" /Fo"Debug\\" /Fd"Debug\vc100.pdb" /Gd /TP /analyze- /errorReport:prompt Client.cpp
          Client.cpp
+     1>d:\onedrive - mail.nankai.edu.cn\file\南开\大三上\计算机网络\smtpserver\smtpserver\client.cpp(10): warning C4005: “USES_CONVERSION”: 宏重定义
+                 c:\program files (x86)\microsoft visual studio 10.0\vc\atlmfc\include\atlconv.h(540) : 参见“USES_CONVERSION”的前一个定义
+     1>d:\onedrive - mail.nankai.edu.cn\file\南开\大三上\计算机网络\smtpserver\smtpserver\client.cpp(11): warning C4005: “T2A”: 宏重定义
+                 c:\program files (x86)\microsoft visual studio 10.0\vc\atlmfc\include\atlconv.h(1014) : 参见“T2A”的前一个定义
+     1>d:\onedrive - mail.nankai.edu.cn\file\南开\大三上\计算机网络\smtpserver\smtpserver\client.cpp(181): warning C4244: “=”: 从“wchar_t”转换到“unsigned char”，可能丢失数据
+     1>d:\onedrive - mail.nankai.edu.cn\file\南开\大三上\计算机网络\smtpserver\smtpserver\client.cpp(223): warning C4800: “BOOL”: 将值强制为布尔值“true”或“false”(性能警告)
+     1>d:\onedrive - mail.nankai.edu.cn\file\南开\大三上\计算机网络\smtpserver\smtpserver\client.cpp(224): warning C4800: “BOOL”: 将值强制为布尔值“true”或“false”(性能警告)
        ResourceCompile:
          所有输出均为最新。
        ManifestResourceCompile:
@@ -31,4 +38,4 @@
 
 生成成功。
 
-已用时间 00:00:00.59
+已用时间 00:01:05.25

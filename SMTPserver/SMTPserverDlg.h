@@ -35,4 +35,6 @@ public:
 	CString dlg_content;
 	CString dlg_annex;
 	Server *server;
+//	int data_begin;
+//	int data_end;
 };
