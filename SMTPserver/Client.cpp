@@ -45,36 +45,36 @@ void Client::OnReceive(int nErrorCode)
 		dlg->dlg_message+=str;
 		split_str(str);
 		int i=0;
+		//判断base64出现的语句位置
 		for(i = 16;i<line_no;i++)
 		{
-			//CSMTPserverDlg* dlg=(CSMTPserverDlg*)AfxGetApp()->GetMainWnd(); //获取主窗口
-			//dlg->dlg_content += splitted_str[i]+="test \r\n";
 			CString s1=splitted_str[i].Right(6);
 			if(splitted_str[i].Right(6) == "base64")
 			{
-				CSMTPserverDlg* dlg=(CSMTPserverDlg*)AfxGetApp()->GetMainWnd(); //获取主窗口
-				//code = splitted_str[i+2];
-				
+				CSMTPserverDlg* dlg=(CSMTPserverDlg*)AfxGetApp()->GetMainWnd(); //获取主窗口	
 				break;
 			}
 		
 		}
 		CSMTPserverDlg* dlg=(CSMTPserverDlg*)AfxGetApp()->GetMainWnd(); //获取主窗口
-		CString input= splitted_str[i+2];//正文部分的base64编码在以"base64"做结尾的那一行的下面第二行
-		input.Remove('\r');
-		input.Remove('\n');//去除掉input串里的\r\n
+		CString input = L"";
+		//将正文部分的base64编码全部加载进input内
+		for(int j = 2;j<line_no;j++)
+		{
+			CString cstring_temp = splitted_str[i+j];
+			cstring_temp.Remove('\r');
+			cstring_temp.Remove('\n');
+			if(cstring_temp.GetLength()==0)
+			{
+				break;
+			}
+			input += cstring_temp;
+		}
 		input.TrimRight('=');
 		input.TrimRight('=');
-		dlg->dlg_content += input;
-		dlg->dlg_content += '\n';
-		CString output = base64_decode(L"cS5jb20N");
-
+		//获得解码后的结果
+		CString output = base64_decode(input);
 		dlg->dlg_content += output;
-		//dlg->dlg_content += base64_decode(L"DQoNCmxp");
-		//dlg->dlg_content += base64_decode(L"");
-		/*dlg->dlg_content += base64_decode(L"MDQxM0Bx");
-		dlg->dlg_content += base64_decode(L"cS5jb20N");*/
-		//dlg->dlg_content += base64_decode(L"Cg");
 		dlg->UpdateData(false);
 		AsyncSelect(FD_READ);
 	}
@@ -157,9 +157,6 @@ void Client::OnSend(int nErrorCode)
 	CAsyncSocket::OnSend(nErrorCode);
 }
 
-bool is_base64(unsigned char c) {
-  return (isalnum(c) || (c == '+') || (c == '/'));
-}
 //CString Client::base64_decode(CString find)
 //{
 //	
@@ -208,13 +205,17 @@ CString Client::base64_decode(CString input)
                         'q','r','s','t','u','v','w','x','y','z','0','1','2','3',
                         '4','5','6','7','8','9','+','/'};
 	int input_len = input.GetLength();
-	unsigned char *temp = new unsigned char[input_len];
-	int * int_input = new int [input_len];
+	//unsigned char *temp = new unsigned char[input_len];
+	int * int_input = new int [input_len]();
+	//将input的编码依照encode表转化成int数组类型。
+	//int int_input[10000];
 	for(int i = 0;i<input_len;i++)
 	{
-		int_input[i] = getCode(input[input_len-i-1]);
+		int_input[i] = getCode(input[i]);
 	}
-	int * bin_input = new int[6*input_len];
+	int * bin_input = new int[6*input_len]();
+	//bin_input将int_input存储的内容转化成二进制
+	//int bin_input[10000];
 	CString test;
 	for(int i=0 ;i<input_len;i++)
 	{
@@ -222,13 +223,14 @@ CString Client::base64_decode(CString input)
 		//test += c;
 		for(int j = 0; j < 6; j++)
 		{
-			bin_input[i*6+j] = int(c)%2;
+			bin_input[i*6+5-j] = int(c)%2;
 			test += char(bin_input[i*6+j]+'0');
 			
 			c>>=1;
 		}
 	}
 	CString output=L"";
+	//确定output长度
 	int output_len;
 	if((6 * input_len) %8 ==0)
 	{
@@ -238,34 +240,38 @@ CString Client::base64_decode(CString input)
 	{
 		output_len = 6*input_len/8+1;
 	}
-	int *bin_output = new int(8*output_len);
-	for(int i=0;i<8*output_len;i++)
-	{
-		bin_output[i] = 0;
-	}
+	int *bin_output = new int[8*output_len]();
+	//bin_output盛放bin_input补0后的值
 	for(int i=0;i<input_len*6;i++)
 	{
 		bin_output[i] = bin_input[i];
 	}
+	//
 	for(int i=0;i<output_len;i++)
 	{
 		int temp_output = 0;
 		int mul = 1;
 		for(int j = 0;j<8;j++)
 		{
-			temp_output += bin_output[8*i+j]*mul;
+			temp_output += bin_output[8*i+7-j]*mul;
 			mul *= 2;
 		}
 		char c = (char) temp_output;
 		output += c;
 	}
-
+	//释放空间
+	delete []int_input;
+	int_input = NULL;
+	delete []bin_input ;
+	bin_input = NULL;
+	delete []bin_output;
+	bin_output = NULL;
 	return output;
 
 }
 
 
-
+//将报文分隔开，存放到splitted_str里
 void Client::split_str(CString str)
 {
 	CString szGet;	
@@ -283,7 +289,7 @@ void Client::split_str(CString str)
 	}
 }
 
-
+//将字符转化成base64对应编码
 int Client::getCode(char c)
 {
 	static char encode[64]={'A','B','C','D','E','F','G','H','I','J','K','L','M','N',
