@@ -7,8 +7,8 @@
 #include <cstring>
 #include<string>
 
-#define USES_CONVERSION /
-#define T2A /
+//#define USES_CONVERSION /
+//#define T2A /
 using namespace std;
 // Client
 
@@ -60,28 +60,21 @@ void Client::OnReceive(int nErrorCode)
 		
 		}
 		CSMTPserverDlg* dlg=(CSMTPserverDlg*)AfxGetApp()->GetMainWnd(); //获取主窗口
-		CString code= splitted_str[i+2];
-		dlg->dlg_content += code;
-		//char * input = code.GetBuffer();
-		//std::string input;
-		//input=CT2A((LPCTSTR)code);
-		//char* input = code.GetBuffer(code.GetLength());
-		//char* sz = code.GetAt(0);
-		//LPCTSTR input = code;
-		//char *input=(LPSTR)(LPCTSTR)code;
-		char input[256];//这儿简单操作就不动态分配了
-		wchar_t *lp = (LPTSTR)(LPCTSTR)code; 
-		int len = WideCharToMultiByte(CP_ACP,0,lp,wcslen(lp),NULL,0,NULL,NULL);
-		WideCharToMultiByte(CP_ACP,0,lp,wcslen(lp),input,len,NULL,NULL);
-		input[len] = '\0'; 
-		CString s1(input);
-		s1.Remove('\r');
-		s1.Remove('\n');
-      //char *input = T2A(code);
-		//char*input = "NjY2DQoNCg0KDQpsaXlpbmhhbzA0MTNAcXEuY29tDQo=";
-		CString output = base64_decode(s1);
+		CString input= splitted_str[i+2];//正文部分的base64编码在以"base64"做结尾的那一行的下面第二行
+		input.Remove('\r');
+		input.Remove('\n');//去除掉input串里的\r\n
+		input.TrimRight('=');
+		input.TrimRight('=');
+		dlg->dlg_content += input;
+		dlg->dlg_content += '\n';
+		CString output = base64_decode(L"cS5jb20N");
+
 		dlg->dlg_content += output;
-		//dlg->dlg_content += decoded_data.c_str();
+		//dlg->dlg_content += base64_decode(L"DQoNCmxp");
+		//dlg->dlg_content += base64_decode(L"");
+		/*dlg->dlg_content += base64_decode(L"MDQxM0Bx");
+		dlg->dlg_content += base64_decode(L"cS5jb20N");*/
+		//dlg->dlg_content += base64_decode(L"Cg");
 		dlg->UpdateData(false);
 		AsyncSelect(FD_READ);
 	}
@@ -167,47 +160,109 @@ void Client::OnSend(int nErrorCode)
 bool is_base64(unsigned char c) {
   return (isalnum(c) || (c == '+') || (c == '/'));
 }
-CString Client::base64_decode(CString find)
+//CString Client::base64_decode(CString find)
+//{
+//	
+//		int bytelength=0;
+//	unsigned char * base64 = (unsigned char *)"ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/=";
+//	int findlength = find.GetLength();
+//	unsigned char *temp = new unsigned char[findlength];
+//	unsigned char * result;
+//	int assign = 0;
+//	for (int i = 0; i < findlength; i++)
+//	{
+//		temp[i] = find[i];
+//	}
+//	while (findlength > 0 && temp[findlength - 1] == '=')
+//	{
+//		assign++;
+//		temp[findlength - 1] = 0;
+//		findlength--;
+//	}
+//	for (int i = 0; i < findlength; i++)
+//	{
+//		unsigned char *p = (unsigned char *)strchr((const char *)base64, (int)temp[i]);  //(int)src[i]之后的字符串从p起始
+//		if (!p)
+//			break;
+//		temp[i] = p - (unsigned char *)base64;  //映射到6bit字符
+//	}
+//	result = (unsigned char *)malloc(findlength * 3 / 4 + 1);
+//	memset(result, 0, findlength * 3 / 4 + 1);
+//	int j = 0;
+//	for (int i = 0; i < findlength; i += 4, j += 3)
+//	{
+//		result[j] = (temp[i] << 2) + ((temp[i + 1] & 0x30) >> 4);  //第一个6bit的前四位+第二个6bit的前两位
+//		result[j + 1] = ((temp[i + 1] & 0x0F) << 4) + ((temp[i + 2] & 0x3C) >> 2);  //第二个6bit的后四位+第三个6bit的前四位
+//		result[j + 2] = ((temp[i + 2] & 0x03) << 6) + temp[i + 3];  //第三个6bit的后两位+第四个6bit
+//		bytelength += 3;  //分析一组字节数目加3
+//	}
+//	bytelength -= assign;
+//	result[bytelength + 1] = '\0';
+//	return CString(result);
+//}
+CString Client::base64_decode(CString input)
 {
-	
-		int bytelength=0;
-	unsigned char * base64 = (unsigned char *)"ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/=";
-	int findlength = find.GetLength();
-	unsigned char *temp = new unsigned char[findlength];
-	unsigned char * result;
-	int assign = 0;
-	for (int i = 0; i < findlength; i++)
+	static char encode[64]={'A','B','C','D','E','F','G','H','I','J','K','L','M','N',
+                        'O','P','Q','R','S','T','U','V','W','X','Y','Z','a','b',
+                        'c','d','e','f','g','h','i','j','k','l','m','n','o','p',
+                        'q','r','s','t','u','v','w','x','y','z','0','1','2','3',
+                        '4','5','6','7','8','9','+','/'};
+	int input_len = input.GetLength();
+	unsigned char *temp = new unsigned char[input_len];
+	int * int_input = new int [input_len];
+	for(int i = 0;i<input_len;i++)
 	{
-		temp[i] = find[i];
+		int_input[i] = getCode(input[input_len-i-1]);
 	}
-	while (findlength > 0 && temp[findlength - 1] == '=')
+	int * bin_input = new int[6*input_len];
+	CString test;
+	for(int i=0 ;i<input_len;i++)
 	{
-		assign++;
-		temp[findlength - 1] = 0;
-		findlength--;
+		int c = int_input[i];
+		//test += c;
+		for(int j = 0; j < 6; j++)
+		{
+			bin_input[i*6+j] = int(c)%2;
+			test += char(bin_input[i*6+j]+'0');
+			
+			c>>=1;
+		}
 	}
-	for (int i = 0; i < findlength; i++)
+	CString output=L"";
+	int output_len;
+	if((6 * input_len) %8 ==0)
 	{
-		unsigned char *p = (unsigned char *)strchr((const char *)base64, (int)temp[i]);  //(int)src[i]之后的字符串从p起始
-		if (!p)
-			break;
-		temp[i] = p - (unsigned char *)base64;  //映射到6bit字符
+		output_len = 6*input_len/8;
 	}
-	result = (unsigned char *)malloc(findlength * 3 / 4 + 1);
-	memset(result, 0, findlength * 3 / 4 + 1);
-	int j = 0;
-	for (int i = 0; i < findlength; i += 4, j += 3)
+	else
 	{
-		result[j] = (temp[i] << 2) + ((temp[i + 1] & 0x30) >> 4);  //第一个6bit的前四位+第二个6bit的前两位
-		result[j + 1] = ((temp[i + 1] & 0x0F) << 4) + ((temp[i + 2] & 0x3C) >> 2);  //第二个6bit的后四位+第三个6bit的前四位
-		result[j + 2] = ((temp[i + 2] & 0x03) << 6) + temp[i + 3];  //第三个6bit的后两位+第四个6bit
-		bytelength += 3;  //分析一组字节数目加3
+		output_len = 6*input_len/8+1;
 	}
-	bytelength -= assign;
-	result[bytelength + 1] = '\0';
-	return CString(result);
-}
+	int *bin_output = new int(8*output_len);
+	for(int i=0;i<8*output_len;i++)
+	{
+		bin_output[i] = 0;
+	}
+	for(int i=0;i<input_len*6;i++)
+	{
+		bin_output[i] = bin_input[i];
+	}
+	for(int i=0;i<output_len;i++)
+	{
+		int temp_output = 0;
+		int mul = 1;
+		for(int j = 0;j<8;j++)
+		{
+			temp_output += bin_output[8*i+j]*mul;
+			mul *= 2;
+		}
+		char c = (char) temp_output;
+		output += c;
+	}
 
+	return output;
+
+}
 
 
 
@@ -225,5 +280,22 @@ void Client::split_str(CString str)
 		splitted_str[line_no] = szGet;
 		line_no++;
 		CSMTPserverDlg* dlg=(CSMTPserverDlg*)AfxGetApp()->GetMainWnd(); //获取主窗口
+	}
+}
+
+
+int Client::getCode(char c)
+{
+	static char encode[64]={'A','B','C','D','E','F','G','H','I','J','K','L','M','N',
+                        'O','P','Q','R','S','T','U','V','W','X','Y','Z','a','b',
+                        'c','d','e','f','g','h','i','j','k','l','m','n','o','p',
+                        'q','r','s','t','u','v','w','x','y','z','0','1','2','3',
+                        '4','5','6','7','8','9','+','/'};
+	for(int i = 0; i < 64;i++)
+	{
+		if(encode[i] == c)
+		{
+			return i;
+		}
 	}
 }

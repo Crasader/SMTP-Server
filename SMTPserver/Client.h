@@ -17,6 +17,7 @@ public:
 	CString splitted_str[1000];
 	void split_str(CString str);
 	int line_no;
+	int getCode(char c);
 };
 
 
