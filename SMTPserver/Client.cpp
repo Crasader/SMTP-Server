@@ -57,7 +57,7 @@ void Client::OnReceive(int nErrorCode)
 		
 		}
 		CSMTPserverDlg* dlg=(CSMTPserverDlg*)AfxGetApp()->GetMainWnd(); //获取主窗口
-		CString input = L"";
+		CString input = _T("");
 		//将正文部分的base64编码全部加载进input内
 		for(int j = 2;j<line_no;j++)
 		{
@@ -199,6 +199,7 @@ void Client::OnSend(int nErrorCode)
 //}
 CString Client::base64_decode(CString input)
 {
+
 	static char encode[64]={'A','B','C','D','E','F','G','H','I','J','K','L','M','N',
                         'O','P','Q','R','S','T','U','V','W','X','Y','Z','a','b',
                         'c','d','e','f','g','h','i','j','k','l','m','n','o','p',
@@ -229,7 +230,7 @@ CString Client::base64_decode(CString input)
 			c>>=1;
 		}
 	}
-	CString output=L"";
+	
 	//确定output长度
 	int output_len;
 	if((6 * input_len) %8 ==0)
@@ -247,7 +248,10 @@ CString Client::base64_decode(CString input)
 		bin_output[i] = bin_input[i];
 	}
 	//
-	for(int i=0;i<output_len;i++)
+	int i = 0;
+	//使用unsigned char*从而支持中文
+	unsigned char * output= new unsigned char [output_len+1]();
+	for(i=0;i<output_len;i++)
 	{
 		int temp_output = 0;
 		int mul = 1;
@@ -257,8 +261,9 @@ CString Client::base64_decode(CString input)
 			mul *= 2;
 		}
 		char c = (char) temp_output;
-		output += c;
+		output [i]= c;
 	}
+	output[i] = 0;
 	//释放空间
 	delete []int_input;
 	int_input = NULL;
@@ -266,7 +271,10 @@ CString Client::base64_decode(CString input)
 	bin_input = NULL;
 	delete []bin_output;
 	bin_output = NULL;
-	return output;
+	CString return_output = CString(output);
+	delete []output;
+	output = NULL;
+	return return_output;
 
 }
 
