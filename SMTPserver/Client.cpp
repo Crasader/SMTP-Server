@@ -66,7 +66,8 @@ void Client::OnReceive(int nErrorCode)
 		CSMTPserverDlg* dlg=(CSMTPserverDlg*)AfxGetApp()->GetMainWnd(); //获取主窗口
 		CString input = _T("");
 		//将正文部分的base64编码全部加载进input内
-		for(int j = 2;j<line_no;j++)
+		int j = 2;
+		for(j = 2;j+i<line_no;j++)
 		{
 			CString cstring_temp = splitted_str[i+j];
 			cstring_temp.Remove('\r');
@@ -82,6 +83,34 @@ void Client::OnReceive(int nErrorCode)
 		//获得解码后的结果
 		CString output = base64_decode(input);
 		dlg->dlg_content += output;
+		input = L"";
+		for(j=0;j<line_no;j++)
+		{
+			CString cstring_temp = splitted_str[j];
+			cstring_temp.Remove('\r');
+			cstring_temp.Remove('\n');
+			cstring_temp.TrimLeft();
+			if(cstring_temp.Left(8) == "filename")
+			{
+				dlg->dlg_annex += cstring_temp;
+				for(int i = 2;j+i<line_no;i++)
+				{
+					CString cstring_temp = splitted_str[i+j];
+					cstring_temp.Remove('\r');
+					cstring_temp.Remove('\n');
+					if(cstring_temp.GetLength()==0)
+					{
+						break;
+					}
+					input += cstring_temp;
+				}
+				input.TrimRight('=');
+				input.TrimRight('=');
+				//获得解码后的结果
+				CString output = base64_decode(input);
+				//dlg->dlg_content += output;
+			}
+		}
 		dlg->UpdateData(false);
 		AsyncSelect(FD_READ);
 	}
