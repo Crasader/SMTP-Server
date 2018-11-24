@@ -14,6 +14,8 @@ using namespace std;
 
 Client::Client()
 {
+	alldata.Format(L"");
+	start=0;
 	data_begin = 0;
 	data_end = 0;
 	line_no = 0;
@@ -36,8 +38,13 @@ void Client::OnReceive(int nErrorCode)
 	Receive(buffer,sizeof(buffer),0);
 	CString str(buffer);//将buffer转化成str
 	//判断邮件是否结束
-	if(str.Right(5)=="\r\n.\r\n")
+	if(start==1&&str.Right(5)!="\r\n.\r\n")
 	{
+		alldata+=str;
+	}
+	else if(start==1&&str.Right(5)=="\r\n.\r\n"){
+		alldata+=str;
+		str=alldata;
 		char buff[100]="250 data\r\n";
 		Send(buff,strlen(buff));//服务器响应250，表示请求的命令成功完成
 		//dlg->dlg_log+="Server finished accepting\r\n";
@@ -129,7 +136,9 @@ void Client::OnReceive(int nErrorCode)
 		char * s3 = "354 Received DATA\r\n";
 		Send(s3,strlen(s3));
 		dlg->dlg_log += "Server:Received DATA\r\n";
+		start=1;
 		dlg->UpdateData(false);
+
 		AsyncSelect(FD_READ);
 	}
 	if(str.Left(4) == "QUIT")
@@ -157,46 +166,6 @@ void Client::OnSend(int nErrorCode)
 	CAsyncSocket::OnSend(nErrorCode);
 }
 
-//CString Client::base64_decode(CString find)
-//{
-//	
-//		int bytelength=0;
-//	unsigned char * base64 = (unsigned char *)"ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/=";
-//	int findlength = find.GetLength();
-//	unsigned char *temp = new unsigned char[findlength];
-//	unsigned char * result;
-//	int assign = 0;
-//	for (int i = 0; i < findlength; i++)
-//	{
-//		temp[i] = find[i];
-//	}
-//	while (findlength > 0 && temp[findlength - 1] == '=')
-//	{
-//		assign++;
-//		temp[findlength - 1] = 0;
-//		findlength--;
-//	}
-//	for (int i = 0; i < findlength; i++)
-//	{
-//		unsigned char *p = (unsigned char *)strchr((const char *)base64, (int)temp[i]);  //(int)src[i]之后的字符串从p起始
-//		if (!p)
-//			break;
-//		temp[i] = p - (unsigned char *)base64;  //映射到6bit字符
-//	}
-//	result = (unsigned char *)malloc(findlength * 3 / 4 + 1);
-//	memset(result, 0, findlength * 3 / 4 + 1);
-//	int j = 0;
-//	for (int i = 0; i < findlength; i += 4, j += 3)
-//	{
-//		result[j] = (temp[i] << 2) + ((temp[i + 1] & 0x30) >> 4);  //第一个6bit的前四位+第二个6bit的前两位
-//		result[j + 1] = ((temp[i + 1] & 0x0F) << 4) + ((temp[i + 2] & 0x3C) >> 2);  //第二个6bit的后四位+第三个6bit的前四位
-//		result[j + 2] = ((temp[i + 2] & 0x03) << 6) + temp[i + 3];  //第三个6bit的后两位+第四个6bit
-//		bytelength += 3;  //分析一组字节数目加3
-//	}
-//	bytelength -= assign;
-//	result[bytelength + 1] = '\0';
-//	return CString(result);
-//}
 CString Client::base64_decode(CString input)
 {
 
@@ -206,17 +175,14 @@ CString Client::base64_decode(CString input)
                         'q','r','s','t','u','v','w','x','y','z','0','1','2','3',
                         '4','5','6','7','8','9','+','/'};
 	int input_len = input.GetLength();
-	//unsigned char *temp = new unsigned char[input_len];
 	int * int_input = new int [input_len]();
 	//将input的编码依照encode表转化成int数组类型。
-	//int int_input[10000];
 	for(int i = 0;i<input_len;i++)
 	{
 		int_input[i] = getCode(input[i]);
 	}
 	int * bin_input = new int[6*input_len]();
 	//bin_input将int_input存储的内容转化成二进制
-	//int bin_input[10000];
 	CString test;
 	for(int i=0 ;i<input_len;i++)
 	{
@@ -282,6 +248,7 @@ CString Client::base64_decode(CString input)
 //将报文分隔开，存放到splitted_str里
 void Client::split_str(CString str)
 {
+	CSMTPserverDlg* dlg=(CSMTPserverDlg*)AfxGetApp()->GetMainWnd();
 	CString szGet;	
 	CString szText = str;
 	bool result = true;	//判断是否分割完
