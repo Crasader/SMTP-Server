@@ -24,8 +24,9 @@ public:
 //	void DecodePicture(void);
 	void DecodePicture(CString input, vector<char>& bytes);
 	vector<char> decodeFileContent;
-	CString filenames[1000];
-	void showImage(CString filename);
+//	CString filenames[1000];
+	void showImage();
+	vector<CString> filenames;
 };
 
 

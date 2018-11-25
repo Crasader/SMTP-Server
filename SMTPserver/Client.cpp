@@ -84,9 +84,10 @@ void Client::OnReceive(int nErrorCode)
 		//获得解码后的结果
 		CString output = base64_decode(input);
 		dlg->dlg_content += output;
-		input = L"";
+		
 		for(j=0;j<line_no;j++)
 		{
+			input = L"";
 			CString filename = splitted_str[j];
 			filename.Remove('\r');
 			filename.Remove('\n');
@@ -111,11 +112,13 @@ void Client::OnReceive(int nErrorCode)
 				}
 				//获得解码后的结果
 				//将图片解码后写入本地
+				decodeFileContent.clear();
 				DecodePicture(input,decodeFileContent);
 				std::fstream fout(filename, std::ios_base::out | std::ios_base::binary);;
 				fout.write(static_cast<const char*>(&decodeFileContent[0]), decodeFileContent.size());
 				fout.close();
-				showImage(filename);
+				//showImage(filename);
+				filenames.push_back(filename);
 			}
 		}
 		
@@ -188,6 +191,7 @@ void Client::OnReceive(int nErrorCode)
 		Send(s4,strlen(s4));
 		dlg->dlg_log += "Server:Received QUIT\r\n";
 		dlg->UpdateData(false);
+		showImage();
 		AsyncSelect(FD_READ);
 	}
 	CAsyncSocket::OnReceive(nErrorCode);
@@ -399,40 +403,45 @@ void Client::DecodePicture(CString input, vector<char>& bytes)
 }
 
 
-void Client::showImage(CString filename)
+void Client::showImage()
 {
 	CSMTPserverDlg* dlg=(CSMTPserverDlg*)AfxGetApp()->GetMainWnd();
-	CImage img;
-	img.Load(filename);
-	CImage image;
-	image.Load(filename);
-	if (!image.IsNull()) 
+	SetStretchBltMode(dlg->dlg_picture.GetDC()->GetSafeHdc(), HALFTONE);
+	CRect dest;
+	dlg->dlg_picture.GetClientRect(&dest);
+	int width = dest.Width()/3;
+	int height = dest.Height()/3;
+	for(int i = 0;i<filenames.size();i++)
 	{
-		SetStretchBltMode(dlg->dlg_picture.GetDC()->GetSafeHdc(), HALFTONE);
+		CImage image;
+		image.Load(filenames[i]);
+		if (!image.IsNull()) 
+		{
+			
 
-		int weight=image.GetWidth();
-		int height=image.GetHeight();
-		// 找出宽和高中的较大值者
-		int Sourcemax=(weight>height)?weight:height;
-		CRect dest;
-		dlg->dlg_picture.GetClientRect(&dest);
-		int destmax=(dest.Width()<dest.Height())?dest.Height():dest.Width();
-		// 计算将图片缩放到TheImage区域所需的比例因子
-		float scale = (float) ( (float) Sourcemax / (float)destmax );
+			int img_width=image.GetWidth();
+			int img_height=image.GetHeight();
+			// 找出宽和高中的较大值者
+			int Sourcemax=(img_width>img_height)?img_width:img_height;
+			
+			int destmax=(width<height)?width:height;
+			// 计算将图片缩放到TheImage区域所需的比例因子
+			float scale = (float) ( (float) Sourcemax / (float)destmax );
 
-		// 缩放后图片的宽和高
-		int neww = (int)( weight/scale );
-		int newh= (int)( height/scale );
+			// 缩放后图片的宽和高
+			int neww = (int)( img_width/scale );
+			int newh= (int)( img_height/scale );
 
-		// 为了将缩放后的图片存入正中部位，需计算图片在 rectDraw 左上角的期望坐标值
-		int tlx = (neww > newh)? 0: (int)(dest.Width()-neww)/2;
-		int tly = (neww > newh)? (int)(dest.Height()-newh)/2: 0;
+			// 为了将缩放后的图片存入正中部位，需计算图片在 rectDraw 左上角的期望坐标值
+			int tlx = (neww > newh)? 0: (int)(width-neww)/2;
+			int tly = (neww > newh)? (int)(height-newh)/2: 0;
 
-		// 设置 rectDraw,用来存入图片image
-		CRect rect = dest;
-		rect.SetRect(tlx, tly, neww, newh);
+			// 设置 rectDraw,用来存入图片image
+			CRect rect = dest;
+				rect.SetRect(i%3*width, i/3*height, i%3*width+neww, i/3*height+newh);
 
-		image.Draw(dlg->dlg_picture.GetDC()->GetSafeHdc(), rect);
+			image.Draw(dlg->dlg_picture.GetDC()->GetSafeHdc(), rect);
 
+		}
 	}
 }
