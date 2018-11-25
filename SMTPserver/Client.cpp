@@ -81,7 +81,6 @@ void Client::OnReceive(int nErrorCode)
 			input += cstring_temp;
 		}
 		input.TrimRight('=');
-		input.TrimRight('=');
 		//获得解码后的结果
 		CString output = base64_decode(input);
 		dlg->dlg_content += output;
@@ -103,6 +102,7 @@ void Client::OnReceive(int nErrorCode)
 					CString cstring_temp = splitted_str[i+j];
 					cstring_temp.Remove('\r');
 					cstring_temp.Remove('\n');
+					cstring_temp.TrimRight('=');
 					if(cstring_temp.GetLength()==0)
 					{
 						break;
@@ -322,43 +322,80 @@ int Client::getCode(char c)
 
 void Client::DecodePicture(CString input, vector<char>& bytes)
 {
-	unsigned char * base64=(unsigned char *)"ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/=";
-
-	 int n,i,j,assign;
-     unsigned char *p;
-     
-     assign=0;
-     n=input.GetLength();  //字符串长度
-
-     CString src;
-	 src.GetBufferSetLength(n);   //申请长度为n的空间
-     for(i=0;i<n;i++)
-         src.SetAt(i,input[i]);   //把input复制到src
- 
-     while(n>0&&src[n-1]=='=')    //判断输入字符串末尾有没有"="-用来填充的零字节
-	 {
-		 src.SetAt(n-1,0);
-         assign++;               //"="的个数
-         n--;
-     }
-     for(i=0;i<n;i++)   
-	 {                           //base 64 ASCII码映射到 6 bit 
-         p=(unsigned char *)strchr((const char *)base64,(int)src[i]);//p返回对应base64字符的位置子串
-         if(!p)
-              break;
-		 src.SetAt(i,p-(unsigned char *)base64); //映射到6 bit
-     }
- 
-     for(i=0;i<n;i+=4) 
-	 {
-		 byte Byte[3];
-         Byte[0]=(src[i]<<2)+((src[i+1]&0x30)>>4);
-         Byte[1]=((src[i+1]&0x0F)<<4)+((src[i+2]&0x3C)>>2);
-         Byte[2]=((src[i+2]&0x03)<<6)+src[i+3];
-
-		 for(j=0;j<3;j++) 
-			bytes.push_back(Byte[j]);   //8 bit 放入到Byte中
-     }
+	static char encode[64]={'A','B','C','D','E','F','G','H','I','J','K','L','M','N',
+                        'O','P','Q','R','S','T','U','V','W','X','Y','Z','a','b',
+                        'c','d','e','f','g','h','i','j','k','l','m','n','o','p',
+                        'q','r','s','t','u','v','w','x','y','z','0','1','2','3',
+                        '4','5','6','7','8','9','+','/'};
+	int input_len = input.GetLength();
+	int * int_input = new int [input_len]();
+	//将input的编码依照encode表转化成int数组类型。
+	for(int i = 0;i<input_len;i++)
+	{
+		int_input[i] = getCode(input[i]);
+	}
+	int * bin_input = new int[6*input_len]();
+	//bin_input将int_input存储的内容转化成二进制
+	CString test;
+	for(int i=0 ;i<input_len;i++)
+	{
+		int c = int_input[i];
+		//test += c;
+		for(int j = 0; j < 6; j++)
+		{
+			bin_input[i*6+5-j] = int(c)%2;
+			test += char(bin_input[i*6+j]+'0');
+			
+			c>>=1;
+		}
+	}
+	
+	//确定output长度
+	int output_len;
+	if((6 * input_len) %8 ==0)
+	{
+		output_len = 6*input_len/8;
+	}
+	else
+	{
+		output_len = 6*input_len/8+1;
+	}
+	int *bin_output = new int[8*output_len]();
+	//bin_output盛放bin_input补0后的值
+	for(int i=0;i<input_len*6;i++)
+	{
+		bin_output[i] = bin_input[i];
+	}
+	//
+	int i = 0;
+	//使用unsigned char*从而支持中文
+	unsigned char * output= new unsigned char [output_len+1]();
+	for(i=0;i<output_len;i++)
+	{
+		int temp_output = 0;
+		int mul = 1;
+		for(int j = 0;j<8;j++)
+		{
+			temp_output += bin_output[8*i+7-j]*mul;
+			mul *= 2;
+		}
+		char c = (char) temp_output;
+		output [i]= c;
+	}
+	output[i] = 0;
+	//释放空间
+	delete []int_input;
+	int_input = NULL;
+	delete []bin_input ;
+	bin_input = NULL;
+	delete []bin_output;
+	bin_output = NULL;
+	for(int i = 0;i<output_len;i++)
+	{
+		bytes.push_back(output[i]);
+	}
+	delete []output;
+	output = NULL;
 }
 
 
