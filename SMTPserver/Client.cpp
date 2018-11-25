@@ -409,6 +409,7 @@ void Client::showImage()
 	SetStretchBltMode(dlg->dlg_picture.GetDC()->GetSafeHdc(), HALFTONE);
 	CRect dest;
 	dlg->dlg_picture.GetClientRect(&dest);
+	//将目标区域划分为九宫格
 	int width = dest.Width()/3;
 	int height = dest.Height()/3;
 	for(int i = 0;i<filenames.size();i++)
@@ -417,28 +418,23 @@ void Client::showImage()
 		image.Load(filenames[i]);
 		if (!image.IsNull()) 
 		{
-			
-
 			int img_width=image.GetWidth();
 			int img_height=image.GetHeight();
 			// 找出宽和高中的较大值者
 			int Sourcemax=(img_width>img_height)?img_width:img_height;
 			
 			int destmax=(width<height)?width:height;
-			// 计算将图片缩放到TheImage区域所需的比例因子
+			// 将图片缩放
 			float scale = (float) ( (float) Sourcemax / (float)destmax );
 
 			// 缩放后图片的宽和高
 			int neww = (int)( img_width/scale );
 			int newh= (int)( img_height/scale );
 
-			// 为了将缩放后的图片存入正中部位，需计算图片在 rectDraw 左上角的期望坐标值
-			int tlx = (neww > newh)? 0: (int)(width-neww)/2;
-			int tly = (neww > newh)? (int)(height-newh)/2: 0;
 
 			// 设置 rectDraw,用来存入图片image
 			CRect rect = dest;
-				rect.SetRect(i%3*width, i/3*height, i%3*width+neww, i/3*height+newh);
+			rect.SetRect(i%3*width, i/3*height, i%3*width+neww, i/3*height+newh);
 
 			image.Draw(dlg->dlg_picture.GetDC()->GetSafeHdc(), rect);
 
