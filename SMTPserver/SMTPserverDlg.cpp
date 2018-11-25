@@ -69,6 +69,7 @@ void CSMTPserverDlg::DoDataExchange(CDataExchange* pDX)
 	DDX_Text(pDX, IDC_EDIT3, dlg_message);
 	DDX_Text(pDX, IDC_EDIT1, dlg_content);
 	DDX_Text(pDX, IDC_EDIT4, dlg_annex);
+	DDX_Control(pDX, IDC_PICTURE, dlg_picture);
 }
 
 BEGIN_MESSAGE_MAP(CSMTPserverDlg, CDialogEx)

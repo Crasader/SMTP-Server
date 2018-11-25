@@ -6,6 +6,8 @@
 #include "Client.h"
 #include <cstring>
 #include<string>
+#include<fstream>
+#include<vector>
 
 //#define USES_CONVERSION /
 //#define T2A /
@@ -86,13 +88,16 @@ void Client::OnReceive(int nErrorCode)
 		input = L"";
 		for(j=0;j<line_no;j++)
 		{
-			CString cstring_temp = splitted_str[j];
-			cstring_temp.Remove('\r');
-			cstring_temp.Remove('\n');
-			cstring_temp.TrimLeft();
-			if(cstring_temp.Left(8) == "filename")
+			CString filename = splitted_str[j];
+			filename.Remove('\r');
+			filename.Remove('\n');
+			filename.TrimLeft();
+			if(filename.Left(8) == "filename")
 			{
-				dlg->dlg_annex += cstring_temp;
+
+				filename = filename.Right(filename.GetLength() - 9);//获取附件文件名
+				filename .Remove('"');//将"去掉
+				dlg->dlg_annex += (filename + L";");
 				for(int i = 2;j+i<line_no;i++)
 				{
 					CString cstring_temp = splitted_str[i+j];
@@ -104,13 +109,16 @@ void Client::OnReceive(int nErrorCode)
 					}
 					input += cstring_temp;
 				}
-				input.TrimRight('=');
-				input.TrimRight('=');
 				//获得解码后的结果
-				CString output = base64_decode(input);
-				//dlg->dlg_content += output;
+				//将图片解码后写入本地
+				DecodePicture(input,decodeFileContent);
+				std::fstream fout(filename, std::ios_base::out | std::ios_base::binary);;
+				fout.write(static_cast<const char*>(&decodeFileContent[0]), decodeFileContent.size());
+				fout.close();
+				showImage(filename);
 			}
 		}
+		
 		dlg->UpdateData(false);
 		AsyncSelect(FD_READ);
 	}
@@ -307,5 +315,87 @@ int Client::getCode(char c)
 		{
 			return i;
 		}
+	}
+}
+
+
+
+void Client::DecodePicture(CString input, vector<char>& bytes)
+{
+	unsigned char * base64=(unsigned char *)"ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/=";
+
+	 int n,i,j,assign;
+     unsigned char *p;
+     
+     assign=0;
+     n=input.GetLength();  //字符串长度
+
+     CString src;
+	 src.GetBufferSetLength(n);   //申请长度为n的空间
+     for(i=0;i<n;i++)
+         src.SetAt(i,input[i]);   //把input复制到src
+ 
+     while(n>0&&src[n-1]=='=')    //判断输入字符串末尾有没有"="-用来填充的零字节
+	 {
+		 src.SetAt(n-1,0);
+         assign++;               //"="的个数
+         n--;
+     }
+     for(i=0;i<n;i++)   
+	 {                           //base 64 ASCII码映射到 6 bit 
+         p=(unsigned char *)strchr((const char *)base64,(int)src[i]);//p返回对应base64字符的位置子串
+         if(!p)
+              break;
+		 src.SetAt(i,p-(unsigned char *)base64); //映射到6 bit
+     }
+ 
+     for(i=0;i<n;i+=4) 
+	 {
+		 byte Byte[3];
+         Byte[0]=(src[i]<<2)+((src[i+1]&0x30)>>4);
+         Byte[1]=((src[i+1]&0x0F)<<4)+((src[i+2]&0x3C)>>2);
+         Byte[2]=((src[i+2]&0x03)<<6)+src[i+3];
+
+		 for(j=0;j<3;j++) 
+			bytes.push_back(Byte[j]);   //8 bit 放入到Byte中
+     }
+}
+
+
+void Client::showImage(CString filename)
+{
+	CSMTPserverDlg* dlg=(CSMTPserverDlg*)AfxGetApp()->GetMainWnd();
+	CImage img;
+	img.Load(filename);
+	CImage image;
+	image.Load(filename);
+	if (!image.IsNull()) 
+	{
+		SetStretchBltMode(dlg->dlg_picture.GetDC()->GetSafeHdc(), HALFTONE);
+
+		int weight=image.GetWidth();
+		int height=image.GetHeight();
+		// 找出宽和高中的较大值者
+		int Sourcemax=(weight>height)?weight:height;
+		CRect dest;
+		dlg->dlg_picture.GetClientRect(&dest);
+		int destmax=(dest.Width()<dest.Height())?dest.Height():dest.Width();
+		// 计算将图片缩放到TheImage区域所需的比例因子
+		float scale = (float) ( (float) Sourcemax / (float)destmax );
+
+		// 缩放后图片的宽和高
+		int neww = (int)( weight/scale );
+		int newh= (int)( height/scale );
+
+		// 为了将缩放后的图片存入正中部位，需计算图片在 rectDraw 左上角的期望坐标值
+		int tlx = (neww > newh)? 0: (int)(dest.Width()-neww)/2;
+		int tly = (neww > newh)? (int)(dest.Height()-newh)/2: 0;
+
+		// 设置 rectDraw,用来存入图片image
+		CRect rect = dest;
+		rect.SetRect(tlx, tly, neww, newh);
+
+		image.Draw(dlg->dlg_picture.GetDC()->GetSafeHdc(), rect);
+
 	}
 }

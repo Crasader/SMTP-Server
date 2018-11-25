@@ -4,6 +4,7 @@
 
 #pragma once
 #include"Server.h"
+#include "afxwin.h"
 // CSMTPserverDlg ¶Ô»°¿ò
 class Server;
 class CSMTPserverDlg : public CDialogEx
@@ -37,4 +38,5 @@ public:
 	Server *server;
 //	int data_begin;
 //	int data_end;
+	CStatic dlg_picture;
 };

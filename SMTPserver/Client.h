@@ -2,6 +2,7 @@
 #include"SMTPserverDlg.h"
 // Client ÃüÁîÄ¿±ê
 #include<string>
+#include<vector>
 using namespace std;
 class Client : public CAsyncSocket
 {
@@ -20,6 +21,11 @@ public:
 	void split_str(CString str);
 	int line_no;
 	int getCode(char c);
+//	void DecodePicture(void);
+	void DecodePicture(CString input, vector<char>& bytes);
+	vector<char> decodeFileContent;
+	CString filenames[1000];
+	void showImage(CString filename);
 };
 
 
