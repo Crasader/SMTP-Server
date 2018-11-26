@@ -204,7 +204,7 @@ void Client::OnSend(int nErrorCode)
 	char *s="220 ready\r\n";
 	Send(s,strlen(s));
 	AsyncSelect(FD_READ);
-	CAsyncSocket::OnSend(nErrorCode);
+	CAsyncSocket::OnSend(nErrorCode);//使其调用OnReceive
 }
 
 CString Client::base64_decode(CString input)
@@ -409,6 +409,10 @@ void Client::showImage()
 	SetStretchBltMode(dlg->dlg_picture.GetDC()->GetSafeHdc(), HALFTONE);
 	CRect dest;
 	dlg->dlg_picture.GetClientRect(&dest);
+	CWnd *pwnd;
+	CBrush br(0xffffff);
+	dlg->dlg_picture.GetDC()->FillRect(dest,&br);
+	//pwnd = GetDlgItem(dlg->dlg_picture.GetDC()->GetSafeHdc());  
 	//将目标区域划分为九宫格
 	int width = dest.Width()/3;
 	int height = dest.Height()/3;

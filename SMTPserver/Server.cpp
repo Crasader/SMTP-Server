@@ -35,7 +35,7 @@ void Server::OnAccept(int nErrorCode)
 		dlg->dlg_log+="Connecting is being established\r\n";
 		//dlg->UpdateData(false);
 
-		socket->AsyncSelect(FD_WRITE);
+		socket->AsyncSelect(FD_WRITE);//使其调用Client类中的OnSend函数
 	}
 	else
 	{

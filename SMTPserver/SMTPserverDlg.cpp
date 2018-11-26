@@ -110,9 +110,9 @@ BOOL CSMTPserverDlg::OnInitDialog()
 	SetIcon(m_hIcon, TRUE);			// 设置大图标
 	SetIcon(m_hIcon, FALSE);		// 设置小图标
 	server = new Server();
-	server->Create(25);
+	server->Create(25);//绑定端口号
 	// TODO: 在此添加额外的初始化代码
-	server->Listen();
+	server->Listen();//开始监听
 	return TRUE;  // 除非将焦点设置到控件，否则返回 TRUE
 }
 
